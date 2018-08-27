@@ -45,6 +45,7 @@ class arrival:
 
 
 def get_arrivals():
+    save_response(request('stop_event_request.xml'), 'stop_event_response.xml')
     tree = etree.parse('stop_event_response.xml',
                        etree.XMLParser(encoding='utf-8'))
     i = 0
@@ -80,16 +81,20 @@ def get_arrivals():
 
 
 def run_countdown():
-    save_response(request('stop_event_request.xml'), 'stop_event_response.xml')
     data = get_arrivals()
+    i = 0
     while True:
         for item in data:
             datetime_object = datetime.datetime.strptime(
-                item.time.replace("\n",""), '%Y-%m-%dT%H:%M:%S')
+                item.time.replace("\n", ""), '%Y-%m-%dT%H:%M:%S')
             entry = arrival_inf()
             entry.line = item.line
             entry.direction = item.direction
             entry.time = datetime_object-datetime.datetime.now()
             print(entry, end='\r')
+        if i > 150000:
+            data = get_arrivals()
+            i = 0
+
 
 run_countdown()
