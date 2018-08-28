@@ -26,6 +26,7 @@ def start_up():
 
 
 def request(request_file, stop):
+    """Sends a given request to the server."""
     global RequestorRef
     file = open(request_file, "r")
     xml = file.read().replace(
@@ -38,6 +39,7 @@ def request(request_file, stop):
 
 
 def get_StopPointRef(stop):
+    """Fetches the StopPointRef for the name given in the argument stop."""
     save_response(request("location_information_request.xml",
                           stop), "location_information_response.xml")
     tree = etree.parse("location_information_response.xml",
@@ -47,6 +49,7 @@ def get_StopPointRef(stop):
 
 
 def save_response(request, filename):
+    """Saves the response from a request to a file."""
     f = open(filename, 'w', encoding="utf-8")
     print("saved")
     f.write(request)
@@ -55,6 +58,7 @@ def save_response(request, filename):
 
 
 def get_arrivals(stop):
+    """Parses the arrival information from the response and returns it in an array."""
     print(request('stop_event_request.xml', stop))
     save_response(request('stop_event_request.xml', stop),
                   'stop_event_response.xml')
@@ -93,6 +97,7 @@ def get_arrivals(stop):
 
 
 def run_countdown(stop):
+    """Displays a countdown for the next arrival."""
     data = get_arrivals(stop)
     i = 0
     while True:
