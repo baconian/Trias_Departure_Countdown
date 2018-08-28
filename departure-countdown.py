@@ -2,9 +2,7 @@ import requests
 import datetime
 from dateutil.parser import parse
 import xml.etree.ElementTree as etree
-
-
-RequestorRef = ""  # Enter your RequestorRef here.
+import sys
 
 
 class arrival_inf:
@@ -14,38 +12,52 @@ class arrival_inf:
         self.direction = None
 
     def toString(self):
-        return "{0}{1}{2}".format(self.line, self.time, self.direction)
+        return "{0}|{1}|{2}".format(self.line, self.time, self.direction)
 
     def __repr__(self):
-        return "{0}{1}{2}".format(self.line, self.time, self.direction)
+        return "{0}|{1}|{2}".format(self.line, self.time, self.direction)
 
 
-def request(request_file):
+def start_up():
+    global RequestorRef
+    stop = input("Please enter the stop you want a countdown for.")
+    RequestorRef = input("Enter your RequestorRef here.")
+    return stop
+
+
+def request(request_file, stop):
+    global RequestorRef
     file = open(request_file, "r")
     xml = file.read().replace(
-        "%Timestamp%", datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+        "$Timestamp", datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
     file.close()
-    xml = xml.replace("%RequestorRef%", RequestorRef)
+    xml = xml.replace("$stop", stop)
     r = requests.post("https://trias.vrn.de/Middleware/Data/trias",
                       data=xml).text.replace("<", "\n<")
     return r
 
 
+def get_StopPointRef(stop):
+    save_response(request("location_information_request.xml",
+                          stop), "location_information_response.xml")
+    tree = etree.parse("location_information_response.xml",
+                       etree.XMLParser(encoding='utf-8'))
+    StopPointRef = tree.find('.//{trias}StopPointRef')
+    return StopPointRef.text
+
+
 def save_response(request, filename):
     f = open(filename, 'w', encoding="utf-8")
+    print("saved")
     f.write(request)
     f.close()
     return None
 
 
-class arrival:
-    def __init__(self, line, time):
-        self.line = line
-        self.time = time
-
-
-def get_arrivals():
-    save_response(request('stop_event_request.xml'), 'stop_event_response.xml')
+def get_arrivals(stop):
+    print(request('stop_event_request.xml', stop))
+    save_response(request('stop_event_request.xml', stop),
+                  'stop_event_response.xml')
     tree = etree.parse('stop_event_response.xml',
                        etree.XMLParser(encoding='utf-8'))
     i = 0
@@ -80,8 +92,8 @@ def get_arrivals():
     return arrivals
 
 
-def run_countdown():
-    data = get_arrivals()
+def run_countdown(stop):
+    data = get_arrivals(stop)
     i = 0
     while True:
         for item in data:
@@ -91,10 +103,11 @@ def run_countdown():
             entry.line = item.line
             entry.direction = item.direction
             entry.time = datetime_object-datetime.datetime.now()
-            print(entry, end='\r')
+            print(entry, end="\r")
         if i > 150000:
-            data = get_arrivals()
+            data = get_arrivals(stop)
             i = 0
 
 
-run_countdown()
+stop = start_up()
+run_countdown(get_StopPointRef(stop))

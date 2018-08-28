@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <Trias xmlns="trias" xmlns:siri="http://www.siri.org.uk/siri" version="1.0">
     <ServiceRequest>
-    <siri:RequestTimestamp>%Timestamp%</siri:RequestTimestamp>
-    <siri:RequestorRef>%RequestorRef%</siri:RequestorRef>
+    <siri:RequestTimestamp>$Timestamp</siri:RequestTimestamp>
+    <siri:RequestorRef>$RequestorRef</siri:RequestorRef>
         <RequestPayload>
             <StopEventRequest>
                     <Location>
                         <LocationRef>
-                            <StopPointRef>de:08221:1143</StopPointRef>
+                            <StopPointRef>$stop</StopPointRef>
                             <LocationName>
-                                    <Text>Heidelberg, Bethanien-Krankenhaus</Text><Language>de</Language>
+                                    <Text></Text><Language>de</Language>
                             </LocationName>
                         </LocationRef>
                     </Location>
