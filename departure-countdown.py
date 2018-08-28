@@ -19,11 +19,23 @@ class arrival_inf:
 
 
 def start_up():
+    """Prompts the user for the stop and RequestorRef."""
     global RequestorRef
-    stop = input("Please enter the stop you want a countdown for.")
-    RequestorRef = input("Enter your RequestorRef here.")
-    return stop
+    stop = input("Please enter the stop you want a countdown for:\n")
+    StopPointOptions=get_StopPointRef(stop)
+    i=1
+    keys = list(StopPointOptions)
+    if len(StopPointOptions)>1:
+        for key in StopPointOptions:
+            print("["+str(i)+"] "+StopPointOptions[key])
+            i+=1
+        stopInt=input("Please select the stop you are looking for by entering the number:")
 
+        stop=StopPointOptions[keys[int(stopInt)-1]]
+    else: 
+        stop=StopPointOptions[keys[0]]
+    RequestorRef = input("Enter your RequestorRef here:\n")
+    return stop
 
 def request(request_file, stop):
     """Sends a given request to the server."""
@@ -44,14 +56,25 @@ def get_StopPointRef(stop):
                           stop), "location_information_response.xml")
     tree = etree.parse("location_information_response.xml",
                        etree.XMLParser(encoding='utf-8'))
-    StopPointRef = tree.find('.//{trias}StopPointRef')
-    return StopPointRef.text
+    StopPointOptions={}
+    StopPointNames = tree.findall('.//{trias}StopPointName')
+    for StopPointRef in tree.findall('.//{trias}StopPointRef'):
+        StopPointOptions[StopPointRef.text.replace("\n","")]=None
+    StopPointNameList=[]
+    for StopPointName in StopPointNames:
+        for node in StopPointName.getiterator():
+            if node.tag == '{trias}Text':
+                StopPointNameList.append(node.text.replace("\n",""))
+    i=0
+    for key in StopPointOptions:
+        StopPointOptions[key]=StopPointNameList[i]
+        i+=1
+    return StopPointOptions
 
 
 def save_response(request, filename):
     """Saves the response from a request to a file."""
     f = open(filename, 'w', encoding="utf-8")
-    print("saved")
     f.write(request)
     f.close()
     return None
@@ -59,7 +82,6 @@ def save_response(request, filename):
 
 def get_arrivals(stop):
     """Parses the arrival information from the response and returns it in an array."""
-    print(request('stop_event_request.xml', stop))
     save_response(request('stop_event_request.xml', stop),
                   'stop_event_response.xml')
     tree = etree.parse('stop_event_response.xml',
@@ -115,4 +137,4 @@ def run_countdown(stop):
 
 
 stop = start_up()
-run_countdown(get_StopPointRef(stop))
+run_countdown(stop)
