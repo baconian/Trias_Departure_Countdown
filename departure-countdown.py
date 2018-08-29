@@ -4,6 +4,7 @@ from dateutil.parser import parse
 import xml.etree.ElementTree as etree
 import sys
 import os.path
+from copy import deepcopy
 
 trias_link = None
 RequestorRef = None
@@ -73,7 +74,12 @@ def load_cfg():
 
 def configure():
     """Configures the program and safes a config file"""
-    trias_link = input("Enter the Trias link you want to use here:\n")
+    global trias_link
+    global RequestorRef
+    trias_link = input("Enter the Trias link you want to use here (leave this field empty to set it to the default value):\n")
+    if trias_link=="":
+        trias_link = "https://trias.vrn.de/Middleware/Data/trias"
+        print("Trias link set to default value.")
     stop = input("Please enter the stop you want a countdown for:\n")
     stop = stop_selector(stop)
     RequestorRef = input("Enter your RequestorRef here:\n")
@@ -166,7 +172,7 @@ def get_arrivals(stop):
         for node in PublishedLine.getiterator():
             if node.tag == '{trias}Text':
                 arrivals.append(arrival_inf())
-                arrivals[i].line = node.text
+                arrivals[i].line = node.text.replace("\n","")
                 i += 1
 
     i = 0
@@ -174,7 +180,7 @@ def get_arrivals(stop):
     for Direction in Directions:
         for node in Direction.getiterator():
             if node.tag == '{trias}Text':
-                arrivals[i].direction = node.text
+                arrivals[i].direction = node.text.replace("\n","")
                 i += 1
 
     i = 0
@@ -194,21 +200,25 @@ def get_arrivals(stop):
 def run_countdown(stop):
     """Displays a countdown for the next arrival."""
     data = get_arrivals(stop)
-    print(data)
-    
-    i = 0
+    display = deepcopy(data)
+    j = 0
+    entries=[]
     while True:
-        for item in data:
+        i=0
+        for item in display:
+            item.line=data[i].line
+            item.direction=data[i].direction
+            item.time=data[i].time
             datetime_object = datetime.datetime.strptime(
                 item.time.replace("\n", ""), '%Y-%m-%dT%H:%M:%S')
-            entry = arrival_inf()
-            entry.line = item.line
-            entry.direction = item.direction
-            entry.time = datetime_object-datetime.datetime.now()
-            print(entry, end="\r")
-        if i > 150000:
+            item.time = datetime_object-datetime.datetime.now()
+            i+=1
+        j+=1
+        print(display, end='\r')
+        if j > 75000:
             data = get_arrivals(stop)
-            i = 0
+            display = deepcopy(data)
+            j = 0
 
 
 stop = start_up()
