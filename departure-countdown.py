@@ -4,6 +4,8 @@ from dateutil.parser import parse
 import xml.etree.ElementTree as etree
 import sys
 import os.path
+import time
+import threading
 from copy import deepcopy
 
 trias_link = None
@@ -196,16 +198,19 @@ def get_arrivals(stop):
 
     return arrivals
 
-
-def run_countdown(stop):
-    """Displays a countdown for the next arrival."""
-    data = get_arrivals(stop)
-    display = deepcopy(data)
-    j = 0
-    entries=[]
+def update_data(stop):
+    global data
     while True:
+        time.sleep(5)
+        data = get_arrivals(stop)
+
+def print_display():
+    global data
+    while True:
+        display=deepcopy(data)
         i=0
         for item in display:
+            time.sleep(0.1)
             item.line=data[i].line
             item.direction=data[i].direction
             item.time=data[i].time
@@ -213,12 +218,18 @@ def run_countdown(stop):
                 item.time.replace("\n", ""), '%Y-%m-%dT%H:%M:%S')
             item.time = datetime_object-datetime.datetime.now()
             i+=1
-        j+=1
         print(display, end='\r')
-        if j > 75000:
-            data = get_arrivals(stop)
-            display = deepcopy(data)
-            j = 0
+
+def run_countdown(stop):
+    global data
+    """Displays a countdown for the next arrival."""
+    data = get_arrivals(stop)
+    t1=threading.Thread(target=print_display,args=())
+    t2=threading.Thread(target=update_data,args=(stop,))
+    t1.start()
+    t2.start()
+        
+        
 
 
 stop = start_up()
