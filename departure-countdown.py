@@ -80,11 +80,11 @@ def configure():
     global RequestorRef
     trias_link = input("Enter the Trias link you want to use here (leave this field empty to set it to the default value):\n")
     if trias_link=="":
-        trias_link = "https://trias.vrn.de/Middleware/Data/trias"
+        trias_link = "https://trias.vrn.de/Middleware/trias"
         print("Trias link set to default value.")
+    RequestorRef = input("Enter your RequestorRef here:\n")
     stop = input("Please enter the stop you want a countdown for:\n")
     stop = stop_selector(stop)
-    RequestorRef = input("Enter your RequestorRef here:\n")
     create_cfg(RequestorRef, trias_link, stop)
     return stop
 
@@ -123,15 +123,17 @@ def request(request_file, stop):
         "$Timestamp", datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
     file.close()
     xml = xml.replace("$stop", stop)
+    xml = xml.replace("$RequestorRef", RequestorRef)
+    headers = {'content-type': 'text/xml ','RequestorRef': RequestorRef}
     r = requests.post(trias_link,
-                      data=xml).text.replace("<", "\n<")
+                      data=xml,headers=headers).text.replace("<", "\n<")
     return r
 
 
 def get_StopPointRef(stop):
     """Fetches the StopPointRef for the name given in the argument stop."""
     save_response(request("location_information_request.xml", stop
-                          ), "location_information_response.xml")
+                          ).strip(), "location_information_response.xml")
     tree = etree.parse("location_information_response.xml",
                        etree.XMLParser(encoding='utf-8'))
     StopPointOptions = {}

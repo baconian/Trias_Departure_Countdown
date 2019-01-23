@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Trias xmlns="http://www.vdv.de/trias" version="1.2">
+<ServiceDelivery>
+<ResponseTimestamp xmlns="http://www.siri.org.uk/siri">2019-01-23T03:53:34Z
+</ResponseTimestamp>
+<ProducerRef xmlns="http://www.siri.org.uk/siri">EFAController10.3.3.81-TRIAS-2
+</ProducerRef>
+<Status xmlns="http://www.siri.org.uk/siri">true
+</Status>
+<MoreData>false
+</MoreData>
+<Language>de
+</Language>
+<DeliveryPayload>
+<LocationInformationResponse>
+<LocationResult>
+<Location>
+<StopPoint>
+<StopPointRef>de:08221:1143
+</StopPointRef>
+<StopPointName>
+<Text>Bethanien-Krankenhaus
+</Text>
+<Language>de
+</Language>
+</StopPointName>
+<LocalityRef>8221000:6
+</LocalityRef>
+<WheelchairAccessible>false
+</WheelchairAccessible>
+<Lighting>false
+</Lighting>
+<Covered>false
+</Covered>
+</StopPoint>
+<LocationName>
+<Text>Heidelberg
+</Text>
+<Language>de
+</Language>
+</LocationName>
+<GeoPosition>
+<Longitude>8.69022
+</Longitude>
+<Latitude>49.39236
+</Latitude>
+</GeoPosition>
+</Location>
+<Complete>true
+</Complete>
+<Probability>0.5
+</Probability>
+</LocationResult>
+</LocationInformationResponse>
+</DeliveryPayload>
+</ServiceDelivery>
+</Trias>

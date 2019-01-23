@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 
-    <Trias xmlns="trias" xmlns:siri="http://www.siri.org.uk/siri" version="1.0">
+    <Trias xmlns="http://www.vdv.de/trias" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2">
 
         <ServiceRequest>
 
-            <siri:RequestTimestamp>2018-01-26T13:42:55</siri:RequestTimestamp>
+            <siri:RequestTimestamp>$Timestamp</siri:RequestTimestamp>
 
             <siri:RequestorRef>$RequestorRef</siri:RequestorRef>
 
             <RequestPayload>
 
-            <LocationInformationRequest>
+                <LocationInformationRequest>
 
-                <InitialInput>
+                    <InitialInput>
 
-                    <LocationName>$stop</LocationName>
+                        <LocationName>$stop</LocationName>
 
-                </InitialInput>
+                    </InitialInput>
 
-            </LocationInformationRequest>
+                    <Restrictions>
+
+                        <Type>stop</Type>
+
+                    </Restrictions>
+
+                </LocationInformationRequest>
 
         </RequestPayload>
 
     </ServiceRequest>
 
 </Trias>
-
- 
